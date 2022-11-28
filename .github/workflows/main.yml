@@ -49,8 +49,8 @@ jobs:
         service_account_email: ${{ secrets.GCP_EMAIL }}
         project_id: ${{ secrets.GCP_PROJECT_ID }}
     
-    - name: Build,tag,push 
+    - name:  test
+      env:
+        IMAGE: ${{ secrets.IMAGE_NAME }}
       run: |
-          docker build -t ${{ secrets.IMAGE_NAME }} .
-          docker tag ${{ secrets.IMAGE_NAME }} gcr.io/secrets.GCP_PROJECT_ID/${{ secrets.CONTAINER_NAME }}
-          docker push gcr.io/secrets.GCP_PROJECT_ID/${{ secrets.CONTAINER_NAME }}
+          docker build -t $IMAGE .

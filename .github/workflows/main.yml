@@ -53,4 +53,4 @@ jobs:
       env:
         IMAGE: ${{ secrets.IMAGE_NAME }}
       run: |
-          docker build -t $IMAGE .
+          docker build -t node-app .

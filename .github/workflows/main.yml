@@ -46,3 +46,6 @@ jobs:
       with:
         version: '270.0.0'
         service_account_key: ${{ secrets.GCP_CREDENTIALS }}
+        service_account_email: ${{ secrets.GCP_EMAIL }}
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        

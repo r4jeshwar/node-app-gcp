@@ -47,10 +47,10 @@ jobs:
     # Change the docker image
     - name: Modify the deployment.yml file
       env:
-        REPOSITORY: $IMAGE_NAME 
+        REPOSITORY: node 
         IMAGE_TAG: $(echo ${{ github.sha }} | head -c 8)
       run: |
-        DOCKER=$IMAGE_NAME:${{ env.IMAGE_TAG }}
+        DOCKER=$REPOSITORY:${{ env.IMAGE_TAG }}
         sed -i 's@CONTAINER_IMAGE@'"$DOCKER"'@' deployment.yml
     
     # Deploy the application in GKE
@@ -61,5 +61,3 @@ jobs:
     - run: |
         kubectl get node    
         kubectl apply -f deployment.yml
-        kubectl get pods
-        kubectl get svc

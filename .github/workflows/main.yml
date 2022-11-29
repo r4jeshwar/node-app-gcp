@@ -53,6 +53,7 @@ jobs:
     
     - name: 
       run: |
+        gcloud auth configure-docker
         docker build -t $IMAGE_NAME .
         docker tag $IMAGE_NAME gcr.io/${{ secrets.GCP_PROJECT_ID }}/node
         docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/node

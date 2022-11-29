@@ -58,3 +58,18 @@ jobs:
         docker tag $IMAGE_NAME gcr.io/${{ secrets.GCP_PROJECT_ID }}/node
         docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/node
 
+    - name:
+      env:
+          REPOSITORY: node 
+          IMAGE_TAG: $(echo ${{ github.sha }} | head -c 8)
+        run: |
+          DOCKER=node:${{ env.IMAGE_TAG }}
+          sed -i 's@CONTAINER_IMAGE@'"$DOCKER"'@' deployment.yml
+
+    - name:
+      uses: tale/kubectl-action@v1
+      with:
+          base64-kube-config: ${{ secrets.KUBE_CONFIG }}
+    - run: |
+      kubectl get node    
+      kubectl apply -f deployment.yml

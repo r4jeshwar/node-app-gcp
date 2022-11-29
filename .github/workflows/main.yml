@@ -10,28 +10,6 @@ on:
   pull_request:
     branches: [ "main" ]
 
-  # Allows you to run this workflow manually from the Actions tab
-#  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
-# jobs:
-#   # This workflow contains a single job called "build"
-#   build:
-#     # The type of runner that the job will run on
-#     runs-on: ubuntu-latest
-
-#     # Steps represent a sequence of tasks that will be executed as part of the job
-#     steps:
-#       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-#       - uses: actions/checkout@v3
-
-#       # Runs a single command using the runners shell
-#       - name: Install kubectl
-#         uses: Azure/setup-kubectl@v3
-#         with:
-#           version: 'v1.21.3' 
-#         id: kubectl
-
 jobs:
   setup-build-publish-deploy:
     name: Setup, Build, Publish, and Deploy
@@ -42,7 +20,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-
+    
+    #Install kubectl
     - name: Install Kubectl
       uses: azure/setup-kubectl@v3   
       with:
@@ -57,22 +36,25 @@ jobs:
         service_account_email: ${{ secrets.GCP_EMAIL }}
         project_id: ${{ secrets.GCP_PROJECT_ID }}
     
-    - name: 
+    # Build and push the image to GCR
+    - name: Push the image to GCR
       run: |
         gcloud auth configure-docker
         docker build -t $IMAGE_NAME .
-        docker tag $IMAGE_NAME gcr.io/${{ secrets.GCP_PROJECT_ID }}/node
-        docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/node
-
-    - name:
+        docker tag $IMAGE_NAME gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCR_REPO_NAME }}
+        docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCR_REPO_NAME }}
+    
+    # Change the docker image
+    - name: Modify the deployment.yml file
       env:
-        REPOSITORY: node 
+        REPOSITORY: $IMAGE_NAME 
         IMAGE_TAG: $(echo ${{ github.sha }} | head -c 8)
       run: |
-        DOCKER=node:${{ env.IMAGE_TAG }}
+        DOCKER=$IMAGE_NAME:${{ env.IMAGE_TAG }}
         sed -i 's@CONTAINER_IMAGE@'"$DOCKER"'@' deployment.yml
-
-    - name:
+    
+    # Deploy the application in GKE
+    - name: Deploy the application
       uses: tale/kubectl-action@v1
       with:
         base64-kube-config: ${{ secrets.KUB_CONFIG }}

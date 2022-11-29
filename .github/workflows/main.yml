@@ -51,7 +51,7 @@ jobs:
         REPOSITORY: node
         IMAGE_TAG: $(echo ${{ github.sha }} | head -c 8)
       run: |
-        DOCKER=$IMAGE_NAME
+        DOCKER=node:${{ env.IMAGE_TAG }}
         sed -i 's@CONTAINER_IMAGE@'"$DOCKER"'@' deployment.yml
     
     # Deploy the application in GKE

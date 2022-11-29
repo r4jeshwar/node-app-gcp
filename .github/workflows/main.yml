@@ -37,6 +37,8 @@ jobs:
     name: Setup, Build, Publish, and Deploy
     runs-on: ubuntu-latest
     environment: production
+    env:
+          IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -49,8 +51,9 @@ jobs:
         service_account_email: ${{ secrets.GCP_EMAIL }}
         project_id: ${{ secrets.GCP_PROJECT_ID }}
     
-    - name:  test
-      env:
-        IMAGE: ${{ secrets.IMAGE_NAME }}
+    - name: 
       run: |
-          docker build -t node-app .
+          docker build -t $IMAGE_NAME .
+          docker tag $IMAGE_NAME gcr.io/${{ secrets.GCP_PROJECT_ID }}/node
+          docker push $IMAGE_NAME gcr.io/${{ secrets.GCP_PROJECT_ID }}/node
+

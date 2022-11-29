@@ -60,16 +60,16 @@ jobs:
 
     - name:
       env:
-          REPOSITORY: node 
-          IMAGE_TAG: $(echo ${{ github.sha }} | head -c 8)
-        run: |
-          DOCKER=node:${{ env.IMAGE_TAG }}
-          sed -i 's@CONTAINER_IMAGE@'"$DOCKER"'@' deployment.yml
+        REPOSITORY: node 
+        IMAGE_TAG: $(echo ${{ github.sha }} | head -c 8)
+      run: |
+        DOCKER=node:${{ env.IMAGE_TAG }}
+        sed -i 's@CONTAINER_IMAGE@'"$DOCKER"'@' deployment.yml
 
     - name:
       uses: tale/kubectl-action@v1
       with:
-          base64-kube-config: ${{ secrets.KUBE_CONFIG }}
+        base64-kube-config: ${{ secrets.KUBE_CONFIG }}
     - run: |
-      kubectl get node    
-      kubectl apply -f deployment.yml
+        kubectl get node    
+        kubectl apply -f deployment.yml 

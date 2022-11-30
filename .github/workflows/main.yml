@@ -63,7 +63,7 @@ jobs:
       run: |
         DOCKER_IMAGE=`gcloud container images describe ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ github.sha }} --format="value(image_summary.digest)"`
         echo "$DOCKER_IMAGE"
-        sed 's@CONTAINER_IMAGE@'"${{ env.REGISTRY }}\/${{ env.PROJECT_ID }\/${{ env.IMAGE_NAME }}$DOCKER_IMAGE"'@' deployment.yml
+        sed 's@CONTAINER_IMAGE@'"${{ env.REGISTRY }}\/${{ env.PROJECT_ID }}\/${{ env.IMAGE_NAME }}$DOCKER_IMAGE"'@' deployment.yml
         cat deployment.yml
         
 #     # Deploy the application in GKE

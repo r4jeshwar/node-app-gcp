@@ -54,8 +54,8 @@ jobs:
    
     - name: echo
       run: |
-        DOCKER_IMAGE=`gcloud container images describe gcr.io/gke-project-370204/test:${{ github.sha }} --format="value(image_summary.digest)" | cut -c 8-19`
-        sed -i 's@CONTAINER_IMAGE@'"$DOCKER_IMAGE":"${{ github.sha }}"'@' deployment.yml
+        DOCKER_IMAGE=`gcloud container images describe gcr.io/gke-project-370204/test:${{ github.sha }} --format="value(image_summary.fully_qualified_digest)"`
+        sed -i 's@CONTAINER_IMAGE@'"$DOCKER_IMAGE"'@' deployment.yml
         cat deployment.yml
         
     # Deploy the application in GKE

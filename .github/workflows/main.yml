@@ -45,22 +45,22 @@ jobs:
         docker tag ${{ secrets.IMAGE_NAME }} gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCR_REPO_NAME }}
         docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCR_REPO_NAME }}
     
-    # # Change the docker image
-    # - name: Modify the deployment.yml file
-    #   env:
-    #     REPOSITORY: node
-    #     IMAGE_TAG: $(echo ${{ github.sha }} | head -c 8)
-    #   run: |
-    #     DOCKER=node:${{ env.IMAGE_TAG }}  
-    #     sed -i 's@CONTAINER_IMAGE@'"$DOCKER"'@' deployment.yml
+    # Change the docker image
+    - name: Modify the deployment.yml file
+      env:
+        REPOSITORY: node
+        IMAGE_TAG: $(echo ${{ github.sha }} | head -c 8)
+      run: |
+        DOCKER=${{ secrets.IMAGE_NAME }}
+        sed -i 's@CONTAINER_IMAGE@'"$DOCKER"'@' deployment.yml
     
-    # # Deploy the application in GKE
-    # - name: Deploy the application
-    #   uses: tale/kubectl-action@v1
-    #   with:
-    #     base64-kube-config: ${{ secrets.KUB_CONFIG }}
-    # - run: |
-    #     kubectl get node    
-    #     kubectl apply -f deployment.yml
-    #     kubectl get pods
-    #     kubectl get svc
+    # Deploy the application in GKE
+    - name: Deploy the application
+      uses: tale/kubectl-action@v1
+      with:
+        base64-kube-config: ${{ secrets.KUB_CONFIG }}
+    - run: |
+        kubectl get node    
+        kubectl apply -f deployment.yml
+        kubectl get pods
+        kubectl get svc

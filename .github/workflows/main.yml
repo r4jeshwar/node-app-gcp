@@ -39,6 +39,8 @@ jobs:
     - name: Login GCR
       id: login_gcr
       uses: elgohr/gcloud-login-action@v1
+      with:
+        account_key: ${{ secrets.GCP_CREDENTIALS }}
 
     - name: Build and push to prod and beta
       id: docker_build

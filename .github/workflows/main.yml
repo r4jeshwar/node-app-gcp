@@ -74,5 +74,3 @@ jobs:
     - run: |
         kubectl get node    
         kubectl apply -f deployment.yml
-        kubectl get pods
-        kubectl get svc

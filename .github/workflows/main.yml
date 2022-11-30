@@ -41,10 +41,6 @@ jobs:
       uses: elgohr/gcloud-login-action@v1
       with:
         account_key: ${{ secrets.GCP_CREDENTIALS }}
-        
-    - name: echo
-      run: |
-        echo "gcr: ${{ steps.login_gcr.outputs.registry }}"
     
     - name: Build and push to prod and beta
       uses: RafikFarhad/push-to-gcr-github-action@v5-beta
@@ -55,6 +51,10 @@ jobs:
         image_name: test
         image_tag: ${{ github.sha }}
         context: .
+   
+    - name: echo
+      run: |
+        gcloud container images describe gcr.io/gke-project-370204/test:${{ github.sha }} --format="value(image_summary.digest)" | cut -c 8-19
 
 
 

@@ -66,13 +66,13 @@ jobs:
         sed 's@CONTAINER_IMAGE@'"${{ env.REGISTRY }}\/${{ env.PROJECT_ID }}\/${{ env.IMAGE_NAME }}\@$DOCKER_IMAGE"'@' deployment.yml
         cat deployment.yml
         
-#     # Deploy the application in GKE
-#     - name: Deploy the application
-#       uses: tale/kubectl-action@v1
-#       with:
-#         base64-kube-config: ${{ secrets.KUBE_CONFIG }}
-#     - run: |
-#         kubectl get node    
-#         kubectl apply -f deployment.yml
-#         kubectl get pods
-#         kubectl get svc
+    # Deploy the application in GKE
+    - name: Deploy the application
+      uses: tale/kubectl-action@v1
+      with:
+        base64-kube-config: ${{ secrets.KUBE_CONFIG }}
+    - run: |
+        kubectl get node    
+        kubectl apply -f deployment.yml
+        kubectl get pods
+        kubectl get svc

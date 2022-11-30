@@ -1,59 +1,42 @@
 ---
-apiVersion: "apps/v1"
-kind: "Deployment"
+apiVersion: v1
+kind: Namespace
 metadata:
-  name: "nginx-2"
-  namespace: "default"
-  labels:
-    app: "nginx-2"
+  name: game-2048
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: game-2048
+  name: deployment-2048
 spec:
-  replicas: 3
   selector:
     matchLabels:
-      app: "nginx-2"
+      app.kubernetes.io/name: app-2048
+  replicas: 3
   template:
     metadata:
       labels:
-        app: "nginx-2"
+        app.kubernetes.io/name: app-2048
     spec:
       containers:
-      - name: "nginx-1"
-        image: CONTAINER_IMAGE
+      - image: CONTAINER_IMAGE
+        imagePullPolicy: Always
+        name: app-2048
+        ports:
+        - containerPort: 80
 ---
-apiVersion: "autoscaling/v2"
-kind: "HorizontalPodAutoscaler"
+apiVersion: v1
+kind: Service
 metadata:
-  name: "nginx-2-hpa-c5ut"
-  namespace: "default"
-  labels:
-    app: "nginx-2"
-spec:
-  scaleTargetRef:
-    kind: "Deployment"
-    name: "nginx-2"
-    apiVersion: "apps/v1"
-  minReplicas: 1
-  maxReplicas: 5
-  metrics:
-  - type: "Resource"
-    resource:
-      name: "cpu"
-      target:
-        type: "Utilization"
-        averageUtilization: 80
----
-apiVersion: "v1"
-kind: "Service"
-metadata:
-  name: "nginx-1-service"
-  namespace: "default"
-  labels:
-    app: "nginx-1"
+  namespace: game-2048
+  name: service-2048
 spec:
   ports:
-  - protocol: "TCP"
-    port: 80
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  type: LoadBalancer
   selector:
-    app: "nginx-1"
-  type: "LoadBalancer"
-  loadBalancerIP: ""
+    app.kubernetes.io/name: app-2048
+---

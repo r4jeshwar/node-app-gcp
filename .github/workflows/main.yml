@@ -58,7 +58,7 @@ jobs:
     - name: Deploy the application
       uses: tale/kubectl-action@v1
       with:
-        base64-kube-config: ${{ secrets.KUB_CONFIG }}
+        base64-kube-config: ${{ secrets.KUBE_CONFIG }}
     - run: |
         kubectl get node    
         kubectl apply -f deployment.yml

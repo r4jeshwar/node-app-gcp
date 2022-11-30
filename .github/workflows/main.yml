@@ -35,32 +35,48 @@ jobs:
         service_account_key: ${{ secrets.GCP_CREDENTIALS }}
         service_account_email: ${{ secrets.GCP_EMAIL }}
         project_id: ${{ secrets.GCP_PROJECT_ID }}
-    
-    # Build and push the image to GCR
-    - name: Push the image to GCR
-      run: |
-        gcloud auth configure-docker
-        docker build -t ${{ secrets.IMAGE_NAME }} .
-        docker images
-        docker tag ${{ secrets.IMAGE_NAME }} gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCR_REPO_NAME }}
-        docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCR_REPO_NAME }}
-    
-    # Change the docker image
-    - name: Modify the deployment.yml file
-      env:
-        REPOSITORY: node
-        IMAGE_TAG: $(echo ${{ github.sha }} | head -c 8)
-      run: |
-        DOCKER=${{ secrets.IMAGE_NAME }}:latest
-        sed -i 's@CONTAINER_IMAGE@'"$DOCKER"'@' deployment.yml
-    
-    # Deploy the application in GKE
-    - name: Deploy the application
-      uses: tale/kubectl-action@v1
+
+    - name: Login GCR
+      id: login_gcr
+      uses: elgohr/gcloud-login-action@v1
+
+    - name: Build and push to prod and beta
+      id: docker_build
+      uses: docker/build-push-action@v2
       with:
-        base64-kube-config: ${{ secrets.KUBE_CONFIG }}
-    - run: |
-        kubectl get node    
-        kubectl apply -f deployment.yml
-        kubectl get pods
-        kubectl get svc
+        push: true
+        context: .
+        tags: |
+          ${{ steps.login_gcr.outputs.registry }}/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCR_REPO_NAME }}:test-${{ github.sha }}                    
+
+
+
+    
+    # # Build and push the image to GCR
+    # - name: Push the image to GCR
+    #   run: |
+    #     gcloud auth configure-docker
+    #     docker build -t ${{ secrets.IMAGE_NAME }} .
+    #     docker images
+    #     docker tag ${{ secrets.IMAGE_NAME }} gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCR_REPO_NAME }}
+    #     docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCR_REPO_NAME }}
+    
+    # # Change the docker image
+    # - name: Modify the deployment.yml file
+    #   # env:
+    #   #   REPOSITORY: node
+    #   #   IMAGE_TAG: $(echo ${{ github.sha }} | head -c 8)
+    #   run: |
+    #     DOCKER=${{ secrets.IMAGE_NAME }}:latest
+    #     sed -i 's@CONTAINER_IMAGE@'"$DOCKER"'@' deployment.yml
+    
+    # # Deploy the application in GKE
+    # - name: Deploy the application
+    #   uses: tale/kubectl-action@v1
+    #   with:
+    #     base64-kube-config: ${{ secrets.KUBE_CONFIG }}
+    # - run: |
+    #     kubectl get node    
+    #     kubectl apply -f deployment.yml
+    #     kubectl get pods
+    #     kubectl get svc

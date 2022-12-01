@@ -66,4 +66,4 @@ jobs:
         base64-kube-config: ${{ secrets.KUBE_CONFIG }}
     - run: |
          kubectl get node    
-         kubectl apply -f ${{ github.workspace }}/deployment.yml
+         kubectl apply -f deployment.yml

@@ -12,18 +12,13 @@ on:
 
 env:
   REGISTRY: gcr.io
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  IMAGE_NAME: test
+  IMAGE_NAME: gke
   
-  
-
 jobs:
   setup-build-publish-deploy:
     name: Setup, Build, Publish, and Deploy
     runs-on: ubuntu-latest
     environment: production
-    # env:
-    #   IMAGE_NAME: gcr.io/${{ env.PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -41,7 +36,7 @@ jobs:
         version: '270.0.0'
         service_account_key: ${{ secrets.GCP_CREDENTIALS }}
         service_account_email: ${{ secrets.GCP_EMAIL }}
-        project_id: ${{ env.PROJECT_ID }}
+        project_id:  ${{ secrets.GCP_PROJECT_ID }}
 
     - name: Login GCR
       id: login_gcr
@@ -54,24 +49,21 @@ jobs:
       with:
         gcloud_service_key: ${{ secrets.GCP_CREDENTIALS }}
         registry: ${{ env.REGISTRY }}
-        project_id: ${{ env.PROJECT_ID }}
+        project_id:  ${{ secrets.GCP_PROJECT_ID }}
         image_name: ${{ env.IMAGE_NAME }}
         image_tag: ${{ github.sha }}
         context: .
    
-    - name: get the image and update the deployment file
-      run: |
-        DOCKER_IMAGE=`gcloud container images describe ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ github.sha }} --format="value(image_summary.digest)"`
-        echo "$DOCKER_IMAGE"
-        # sed 's@CONTAINER_IMAGE@'"${{ env.REGISTRY }}\/${{ env.PROJECT_ID }}\/${{ env.IMAGE_NAME }}\@$DOCKER_IMAGE"'@' deployment.yml
-        sed -i 's@CONTAINER_IMAGE@'"gcr.io\/${{ env.PROJECT_ID }}\/test:${{ github.sha }}"'@' deployment.yml
-        cat deployment.yml
+#     - name: get the image and update the deployment file
+#       run: |
+#         sed -i 's@CONTAINER_IMAGE@'"gcr.io\/${{ env.PROJECT_ID }}\/test:${{ github.sha }}"'@' deployment.yml
+#         cat deployment.yml
         
-    # Deploy the application in GKE
-    - name: Deploy the application
-      uses: tale/kubectl-action@v1
-      with:
-        base64-kube-config: ${{ secrets.KUBE_CONFIG }}
-    - run: |
-        kubectl get node    
-        kubectl apply -f ${{ github.workspace }}/deployment.yml
+#     # Deploy the application in GKE
+#     - name: Deploy the application
+#       uses: tale/kubectl-action@v1
+#       with:
+#         base64-kube-config: ${{ secrets.KUBE_CONFIG }}
+#     - run: |
+#         kubectl get node    
+#         kubectl apply -f ${{ github.workspace }}/deployment.yml
